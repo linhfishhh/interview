@@ -1,0 +1,27 @@
+version: "3.5"
+
+services:
+    database:
+        image: postgres:latest
+        restart: always
+        hostname: database
+        networks:
+            - backend
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: flaskcrud
+    application:
+        build:
+            context: .
+        restart: always
+        ports:
+            - 8088:8088
+        networks:
+            - backend
+        depends_on:
+            - database
+
+networks:
+    backend:
+      driver: "bridge"
