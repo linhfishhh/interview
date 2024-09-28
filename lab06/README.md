@@ -37,13 +37,41 @@ step3: tạo mới 1 public docker repository cho việc test
 ![image](./images/dockerhub.png)
 
 
-build và push image flask app lên public repository này
+login vào public repository ở các node
 
 ```bash
 docker login
+```
 
+build và push image flask app lên public repository này
+
+```bash
 docker build ducdv1/sampleflaskapp:latest . 
 
 docker push ducdv1/sampleflaskapp:latest
 ```
 ![image](./images/dockerhub.png)
+
+
+step3: deploy dockker stack
+
+copy thư mục lab06 vào master node và cd đến lab06
+
+```bash
+docker stack deploy -c docker-stack.yml python_crud_stack
+```
+
+kiểm tra xem container webapp chạy trên node nào
+
+```bash
+docker serivce ls
+
+docker service ps python_crud_stack_application
+```
+![image](./images/dockerservicels.png)
+
+truy cập vào public ip của node đó để verify kết quả
+
+![image](./images/result1.png)
+
+![image](./images/result.png)
