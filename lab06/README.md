@@ -31,3 +31,19 @@ qua màn console của node master kiểm tra xem node đã join thành công ha
 docker node ls
 ```
 ![image](./images/checknode.png)
+
+step3: tạo mới 1 public docker repository cho việc test
+
+![image](./images/dockerhub.png)
+
+
+build và push image flask app lên public repository này
+
+```bash
+docker login
+
+docker build ducdv1/sampleflaskapp:latest . 
+
+docker push ducdv1/sampleflaskapp:latest
+```
+![image](./images/dockerhub.png)
