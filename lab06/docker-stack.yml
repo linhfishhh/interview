@@ -1,26 +1,30 @@
-version: "3.8"
-
+version: '3.8'
 services:
-    database:
-        image: postgres:latest
-        restart: always
-        hostname: database
-        networks:
-            - backend
-        environment:
-            POSTGRES_USER: postgres
-            POSTGRES_PASSWORD: postgres
-            POSTGRES_DB: flaskcrud
-    application:
-        build: .
-        restart: always
-        ports:
-            - 8088:8088
-        networks:
-            - backend
-        depends_on:
-            - database
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: flaskcrud
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  app:
+    build: .  # Docker sẽ build image từ Dockerfile trong thư mục hiện tại
+    ports:
+      - "8088:8088"
+    environment:
+      FLASK_ENV: development
+    depends_on:
+      - db
+    networks:
+      - app-network
 
 networks:
-    backend:
-      driver: overlay
+  app-network:
+    driver: overlay
+
+volumes:
+  postgres_data:
