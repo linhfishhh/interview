@@ -16,6 +16,13 @@ step3: triển khai resource
 terraform apply --auto-approve
 ```
 
+kiểm tra kết quả:
+![image](./images/image1.png)
+
+![image](./images/image.png)
+
+![image](./images/image2.png)
+
 step4: dọn dẹp reosurce
 
 ```bash

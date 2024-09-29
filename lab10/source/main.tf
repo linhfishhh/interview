@@ -10,6 +10,7 @@ terraform {
 
 provider "aws" {
   region = "ap-southeast-1"
+  profile = "interview"
 }
 
 
@@ -26,7 +27,6 @@ variable "vpc" {
     azs           = list(string)
     public_cidrs  = list(string)
     private_cidrs = list(string)
-    cluster_name  = string
   })
 }
 
