@@ -1,0 +1,182 @@
+#for database
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: database
+  labels:
+    app: postgresql
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5432
+    protocol: TCP
+    targetPort: 5432
+  selector:
+    app: database
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: postgresql-conf
+data:
+  postgresql.conf: |
+    listen_addresses = '*'
+    port = '5432'
+    max_connections = 320
+    shared_buffers = 128MB
+    shared_preload_libraries = 'pgaudit'
+
+    wal_level = 'hot_standby'
+    fsync = 'on'
+    max_wal_size = '400MB'
+    max_wal_senders = '16'
+    wal_keep_segments = '12'
+    hot_standby = 'on'
+    client_min_messages = 'error'
+    timezone = 'Asia/Bangkok'
+
+    include_dir = 'conf.d'
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: database
+spec:
+  selector:
+    matchLabels:
+      app: database
+  serviceName: "database"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: database
+    spec:
+      volumes:
+      - name: postgresql-config-volume
+        configMap:
+          name: postgresql-conf
+      - name: postgresql-aof
+        hostPath:
+          path: /var/database
+          type: DirectoryOrCreate
+      initContainers:
+      - name: postgresql-init
+        image: busybox:1.32.0
+        command: ["chmod", "777", "-R", "/bitnami"]
+        volumeMounts:
+        - name: postgresql-aof
+          mountPath: /bitnami
+      containers:
+      - name: postgresql
+        image: bitnami/postgresql:12.6.0
+        env:
+        - name: TZ
+          value: Asia/Jakarta
+        - name: PGTZ
+          value: Asia/Jakarta
+        - name: ALLOW_EMPTY_PASSWORD
+          value: "yes"
+        - name: POSTGRESQL_POSTGRES_PASSWORD
+          value: "postgres"
+        - name: POSTGRESQL_USERNAME
+          value: techmaster
+        - name: POSTGRESQL_PASSWORD
+          value: techmaster@@
+        - name: POSTGRES_DB
+          value: flaskcrud
+        volumeMounts:
+        - name: postgresql-aof
+          mountPath: /bitnami/postgresql
+          subPath: postgresql
+        - name: postgresql-config-volume
+          mountPath: /bitnami/postgresql/conf/postgresql.conf
+          subPath: postgresql.conf
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+          limits:
+            memory: "1Gi"
+            cpu: "400m"
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app-deployment
+  labels:
+    app: web-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-app
+  template:
+    metadata:
+      labels:
+        app: web-app
+    spec:
+      containers:
+      - name: web-app-container
+        image: ducdv1/sampleflaskapp:latest
+        ports:
+        - containerPort: 8088
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 300m
+            memory: 512Mi
+---       
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-app-service
+spec:
+  selector:
+    app: web-app
+  ports:
+    - protocol: TCP
+      port: 8088
+      targetPort: 8088
+  type: ClusterIP 
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ringkas-customer
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ringkas-customer
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 90
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Pods
+        value: 1
+        periodSeconds: 30
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+      - type: Pods
+        value: 1
+        periodSeconds: 60
+      selectPolicy: Max

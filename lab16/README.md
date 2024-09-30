@@ -34,3 +34,5 @@ kiểm tra cụm k8s đã tạo
 kubectl get nodes
 ```
 
+![image](./images/image.png)
+
