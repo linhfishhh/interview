@@ -20,7 +20,10 @@ cách cấu hình này đã guide rõ trong document của aws
 ```bash
 aws configure --profile interview
 ```
+
+```
 **NOTE** lưu ý: mã xác thực này cần có policy để tạo ec2 ở đây mình sử dụng full quyền ec2
+```
 
 step2: tìm kiếm image id với awscli
 ```
