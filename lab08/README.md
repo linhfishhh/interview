@@ -36,7 +36,7 @@ chọn next để tạo resource
 ![image](./images/autoscale4.png)
 
 chọn option scaling policy để scale instance và chọn metric là scale theo CPU cấu hình này có nghĩa autoscaling sẽ tự động scale theo chỉ số CPU
-###behind the sence các instance trong ASG khi đạt chỉ số CPU sẽ tạo ra 1 cloud watch alarm và trigger tạo ra EC2 instance mới
+**NOTE**behind the sence các instance trong ASG khi đạt chỉ số CPU sẽ tạo ra 1 cloud watch alarm và trigger tạo ra EC2 instance mới
 
 ![image](./images/autoscale5.png)
 

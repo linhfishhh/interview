@@ -2,7 +2,7 @@ step1: cài đặt terraform cli
 ```bash
 choco install terraform
 ```
-### terraform sẽ tự đọc cấu hình credentials từ khi đã cấu hình aws cli
+**NOTE** terraform sẽ tự đọc cấu hình credentials từ khi đã cấu hình aws cli
 
 step2: init provider va kiểm tra những resource sẽ được tạo
 
