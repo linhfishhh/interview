@@ -151,12 +151,12 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: ringkas-customer
+  name: web-app-deployment
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: ringkas-customer
+    name: web-app-deployment
   minReplicas: 1
   maxReplicas: 5
   metrics:
